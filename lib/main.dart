@@ -54,6 +54,7 @@ class HomePage extends StatelessWidget {
                   padding: const EdgeInsets.all(16.0),
                   child: StreamBuilder<Option>(
                     initialData: Option.A,
+                    stream: optionStream,
                     builder: (context, snapshot) {
                       final option = snapshot.data ?? Option.A;
                       return _dropDownMenu(context, option);
