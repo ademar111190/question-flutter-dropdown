@@ -74,14 +74,19 @@ class HomePage extends StatelessWidget {
     Option option,
   ) {
     const items = Option.values;
-    return DropdownButtonHideUnderline(
-      child: DropdownButton<Option>(
-        value: option,
-        selectedItemBuilder: (context) =>
-            items.map((e) => _dropdownHandler(context, e)).toList(),
-        items: items.map((e) => _dropdownItem(context, e)).toList(),
-        onChanged: (e) => optionStream.add(e ?? Option.A),
-      ),
+    return GestureDetector(
+      onTapDown: (details) async {
+        final offset = details.globalPosition;
+        final newOption = await showMenu(
+          context: context,
+          position: RelativeRect.fromLTRB(offset.dx, offset.dy, 0, 0),
+          items: items.map((e) => _dropdownItem(context, e, option)).toList(),
+        );
+        if (newOption != null) {
+          optionStream.add(newOption);
+        }
+      },
+      child: _dropdownHandler(context, option),
     );
   }
 
@@ -120,18 +125,21 @@ class HomePage extends StatelessWidget {
     return helper.icon;
   }
 
-  DropdownMenuItem<Option> _dropdownItem(
+  PopupMenuEntry<Option> _dropdownItem(
     BuildContext context,
     Option option,
+    Option selected,
   ) {
     final helper = _dropDownItemData(context, option);
-    return DropdownMenuItem<Option>(
+    return CheckedPopupMenuItem<Option>(
       value: option,
+      checked: option == selected,
       child: Row(
         children: [
-          helper.icon,
-          const SizedBox(width: 16),
+          Expanded(child: Container()),
           Text(helper.text),
+          const SizedBox(width: 16),
+          helper.icon,
         ],
       ),
     );
